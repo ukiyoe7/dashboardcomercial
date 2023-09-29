@@ -9,7 +9,9 @@ con2 <- dbConnect(odbc::odbc(), "repro",encoding="Latin1")
 
 ## QUERY
 
-result <- dbGetQuery(con2, statement = read_file('C:\\Users\\REPRO SANDRO\\Documents\\R\\DASHBOARD_COMERCIAL\\RESULT.sql'))
+result <- dbGetQuery(con2, statement = read_file('RESULT.sql'))
+
+View(result)
 
 
 ## GERA BASE EM CSV
