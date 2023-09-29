@@ -3,7 +3,7 @@
 
 WITH DATE_PED AS (SELECT ID_PEDIDO 
                       FROM PEDID WHERE
-                       PEDDTBAIXA BETWEEN '27.09.2023' AND 'TODAY'),
+                       PEDDTBAIXA BETWEEN '01.08.2023' AND '31.08.2023'),
 
 --  FILTRA CFOPS DE VENDA  
 
@@ -13,14 +13,12 @@ WITH DATE_PED AS (SELECT ID_PEDIDO
 
   CLI AS (SELECT C.CLICODIGO,
                   CLINOMEFANT,
-                   C.GCLCODIGO COD_GRUPO,
-                    IIF(C.GCLCODIGO IS NULL,C.CLICODIGO || ' ' || CLINOMEFANT,'G' || C.GCLCODIGO || ' ' || GCLNOME) NOMECLIENTE,
-                      SETOR 
+                   GCLCODIGO CODGRUPO,
+                      SETOR
                        FROM CLIEN C
                         INNER JOIN (SELECT CLICODIGO, ZODESCRICAO SETOR FROM ENDCLI E
                          INNER JOIN (SELECT ZOCODIGO,ZODESCRICAO FROM ZONA WHERE ZOCODIGO IN(20,21,22,23,24,25,26,28))Z ON E.ZOCODIGO=Z.ZOCODIGO
                           WHERE ENDFAT='S') ED ON C.CLICODIGO=ED.CLICODIGO
-                           LEFT JOIN GRUPOCLI GR ON C.GCLCODIGO=GR.GCLCODIGO
                             WHERE CLICLIENTE='S'),
   
 -- LISTA PEDIDOS
@@ -28,14 +26,15 @@ WITH DATE_PED AS (SELECT ID_PEDIDO
   PED AS (SELECT P.ID_PEDIDO,
                    PEDDTBAIXA,
                     P.CLICODIGO,
-                     COD_GRUPO,
-                      NOMECLIENTE
+                     CLINOMEFANT,
+                      CODGRUPO,
                        SETOR
                           FROM PEDID P
                            INNER JOIN DATE_PED DT ON P.ID_PEDIDO=DT.ID_PEDIDO
                             INNER JOIN CLI C ON P.CLICODIGO=C.CLICODIGO WHERE  PEDSITPED<>'C' AND PEDLCFINANC IN ('S', 'L','N')),
     
 -- LISTA PILARES    
+
      VARILUX AS (SELECT PROCODIGO FROM PRODU WHERE MARCODIGO=57),
       
       KODAK AS (SELECT PROCODIGO FROM PRODU WHERE MARCODIGO IN (24,93)),
@@ -56,8 +55,8 @@ WITH DATE_PED AS (SELECT ID_PEDIDO
   
   SELECT   PEDDTBAIXA DATA,
                CLICODIGO,
-                COD_GRUPO,
-                 NOMECLIENTE
+                CLINOMEFANT,
+                 CODGRUPO,
                   SETOR,
                    PD.PROCODIGO,
                     PDPDESCRICAO,
@@ -87,7 +86,7 @@ WITH DATE_PED AS (SELECT ID_PEDIDO
             LEFT JOIN MCLIENTE MRCL ON MRCL.PROCODIGO=PD.PROCODIGO
              LEFT JOIN TRANSITIONS TRS ON TRS.PROCODIGO=PD.PROCODIGO
               LEFT JOIN PROD PR ON PR.PROCODIGO=PD.PROCODIGO
-               GROUP BY 1,2,3,4,5,6,7,8,9,10,11
+               GROUP BY 1,2,3,4,5,6,7,8,9,10
 
 
 
