@@ -1,5 +1,5 @@
 
-## BIBLIOTECAS E CONEXÕES
+## BIBLIOTECAS E CONEXAO DB
 
 library(DBI)
 library(dplyr)
