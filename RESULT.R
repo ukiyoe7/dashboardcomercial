@@ -7,7 +7,7 @@ library(readr)
 
 con2 <- dbConnect(odbc::odbc(), "repro",encoding="Latin1")
 
-## QUERY
+## QUERYA
 
 result <- dbGetQuery(con2, statement = read_file('RESULT.sql'))
 

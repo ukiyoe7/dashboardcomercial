@@ -3,7 +3,14 @@
 
 WITH DATE_PED AS (SELECT ID_PEDIDO 
                       FROM PEDID WHERE
-                       PEDDTBAIXA BETWEEN '01.08.2023' AND '31.08.2023'),
+                       (PEDDTBAIXA BETWEEN 
+                               CAST(EXTRACT(YEAR FROM CURRENT_DATE) || '-01-01' AS DATE) AND
+                                  'YESTERDAY' 
+                                  OR
+                      PEDDTBAIXA BETWEEN 
+                                  DATEADD(YEAR, -1, CAST(EXTRACT(YEAR FROM CURRENT_DATE) || '-01-01' AS DATE)) AND
+                                  DATEADD(YEAR, -1, CURRENT_DATE-1)
+                                  )),
 
 --  FILTRA CFOPS DE VENDA  
 
