@@ -9,11 +9,11 @@ con2 <- dbConnect(odbc::odbc(), "repro",encoding="Latin1")
 
 ## RESULT
 
-result <- dbGetQuery(con2, statement = read_file('RESULT.sql'))
+result <- dbGetQuery(con2, statement = read_file('SQL/RESULT.sql'))
 
 View(result)
 
-
+result %>% group_by(ANO,MES) %>% tally() %>% View()
 
 ## PILARES
 
@@ -29,7 +29,7 @@ pilares %>%
 
 # DESCONTOS
 
-descontos <- dbGetQuery(con2, statement = read_file('DESCONTOS.sql'))
+descontos <- dbGetQuery(con2, statement = read_file('SQL/DESCONTOS.sql'))
 
 View(descontos)
 
@@ -39,4 +39,17 @@ View(descontos)
 cliendesc <- dbGetQuery(con2, statement = read_file('DESCONTO_GERAL.sql'))
 
 View(cliendesc)
+
+# VLXESPECIALISTA
+
+
+vlx_esp <- dbGetQuery(con2, statement = read_file('SQL/VLX_ESPECIAL.sql'))
+
+View(vlx_esp)
+
+# PACOTES
+
+pacotes <- dbGetQuery(con2, statement = read_file('SQL/PACOTES.sql'))
+
+View(pacotes)
 
