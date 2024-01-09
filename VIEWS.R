@@ -47,6 +47,15 @@ vlx_esp <- dbGetQuery(con2, statement = read_file('SQL/VLX_ESPECIAL.sql'))
 
 View(vlx_esp)
 
+# STATUSCLI
+
+
+statuscli <- dbGetQuery(con2, statement = read_file('SQL/STATUSCLI.sql'))
+
+View(statuscli)
+
+
+
 # PACOTES
 
 pacotes <- dbGetQuery(con2, statement = read_file('SQL/PACOTES.sql'))
