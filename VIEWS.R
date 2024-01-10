@@ -55,6 +55,14 @@ statuscli <- dbGetQuery(con2, statement = read_file('SQL/STATUSCLI.sql'))
 View(statuscli)
 
 
+# BLOQUEIO
+
+
+bloqueio <- dbGetQuery(con2, statement = read_file('SQL/BLOQUEIO.sql'))
+
+View(bloqueio)
+
+
 
 # PACOTES
 
