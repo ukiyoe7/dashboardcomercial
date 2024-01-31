@@ -1,4 +1,12 @@
-WITH BLOQ AS(
+WITH CLI AS (SELECT DISTINCT C.CLICODIGO,GCLCODIGO FROM CLIEN C
+                       INNER JOIN (SELECT CLICODIGO,E.ZOCODIGO FROM ENDCLI E
+                        INNER JOIN (SELECT ZOCODIGO FROM ZONA 
+                         WHERE ZOCODIGO IN (20))Z ON 
+                          E.ZOCODIGO=Z.ZOCODIGO WHERE ENDFAT='S')A ON C.CLICODIGO=A.CLICODIGO
+                           WHERE CLICLIENTE='S'),
+
+
+BLOQ AS(
 SELECT 
        RECCODIGO 
      , CLICODIGO 
@@ -34,7 +42,7 @@ SELECT
   FROM Receb 
  WHERE recsituacao   <> 'C'
    AND recValorAberto > 0.009 
-   AND recdtVencto    < '03.01.2024'           
+   AND recdtVencto    < DATEADD(-7 DAY TO CURRENT_DATE)            
 
  UNION 
  SELECT
@@ -72,8 +80,10 @@ SELECT
    FROM RecebP 
   WHERE recsituacao   <> 'C'
     AND recValorAberto > 0.009 
-   AND recdtVencto < '03.01.2024'            
+   AND recdtVencto < DATEADD(-7 DAY TO CURRENT_DATE)           
 
  ORDER BY 16 DESC)
  
- SELECT DISTINCT CLICODIGO FROM BLOQ
+ SELECT DISTINCT B.CLICODIGO 
+   FROM BLOQ B
+    INNER JOIN CLI C ON B.CLICODIGO=C.CLICODIGO

@@ -6,8 +6,10 @@ WITH  CLI AS (SELECT DISTINCT C.CLICODIGO,GCLCODIGO FROM CLIEN C
                            WHERE CLICLIENTE='S')
 
 SELECT DISTINCT NC.CLICODIGO,
-                 GCLCODIGO 
+                 GCLCODIGO,
+                   NVALORESCLIEN
                   FROM NROTULOSCLIEN NC
                    INNER JOIN CLI C ON NC.CLICODIGO=C.CLICODIGO
-                    WHERE RTCCODIGO=3
+                    LEFT JOIN NVALORESCLIEN N ON NC.CLICODIGO=N.CLICODIGO
+                    WHERE N.RTCCODIGO=3
 
