@@ -6,6 +6,20 @@ library(lubridate)
 
 con2 <- dbConnect(odbc::odbc(), "repro",encoding="Latin1")
 
+## CLI ==============================================
+
+
+cli <- dbGetQuery(con2, statement = read_file('SQL/CLI.sql'))
+
+View(cli)
+
+## GRUPOS ==============================================
+
+
+grupos <- dbGetQuery(con2, statement = read_file('SQL/GRUPOS.sql'))
+
+View(grupos)
+
 
 ## RESULT ==============================================
 
@@ -125,3 +139,33 @@ dbGetQuery(con2,"SELECT * FROM CLITBP WHERE TBPCODIGO=307") %>%
   inner_join(.,acordos_mclientes2,by="TBPCODIGO") %>% 
 write.csv2(.,file = "C:\\Users\\REPRO SANDRO\\Documents\\R\\DASHBOARD_COMERCIAL\\BASES\\acordos_mclientes_relrepro.csv",row.names = FALSE,na="")
 
+
+# NIVEL DE SERVIÇO ====================================================================
+  
+  nivel_servico <- dbGetQuery(con2, statement = read_file('SQL/NIVEL_DE_SERVICO.sql'))
+  
+  View(nivel_servico)
+
+nivel_servico2 <-
+nivel_servico %>%  
+  mutate(ENTREGA2=as.POSIXct(sprintf("%s %s",ENTREGA,HRENTREGA),format="%Y-%m-%d %H:%M")) %>%
+  mutate(SAIDA2=as.POSIXct(sprintf("%s %s",SAIDA,HRSAIDA),format="%Y-%m-%d %H:%M")) %>% 
+  mutate(DIFTIME=difftime(SAIDA2,ENTREGA2)) %>% 
+  mutate(DIFTIME_IN_MINUTES = if_else((as.numeric(DIFTIME)/60)>0,1,0)) 
+
+View(nivel_servico2)
+
+write.csv2(nivel_servico2,file = "C:\\Users\\REPRO SANDRO\\Documents\\DASHBOARD FV\\nivel_servico2.csv",row.names = FALSE,na="")
+
+nivel_servico %>%  
+  mutate(ENTREGA2=as.POSIXct(sprintf("%s %s",ENTREGA,HRENTREGA),format="%Y-%m-%d %H:%M")) %>%
+   mutate(SAIDA2=as.POSIXct(sprintf("%s %s",SAIDA,HRSAIDA),format="%Y-%m-%d %H:%M")) %>% 
+    mutate(DIFTIME=difftime(SAIDA2,ENTREGA2)) %>% 
+     mutate(DIFTIME_IN_MINUTES = if_else((as.numeric(DIFTIME)/60)>0,1,0)) %>% 
+     ## group_by(CLICODIGO) %>% 
+      summarize(v=n_distinct(ID_PEDIDO[DIFTIME_IN_MINUTES==0])/n_distinct(ID_PEDIDO)) %>% View()
+
+
+nivel_servico_full <- dbGetQuery(con2, statement = read_file('SQL/NIVEL_DE_SERVICO_FULL.sql'))
+
+View(nivel_servico_full)
