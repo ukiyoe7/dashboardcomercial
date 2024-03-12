@@ -1,3 +1,5 @@
+
+-- CLIENTES
 WITH CLI AS (SELECT DISTINCT C.CLICODIGO,
                               GCLCODIGO,
                                CLIPCDESCPRODU 
@@ -5,32 +7,41 @@ WITH CLI AS (SELECT DISTINCT C.CLICODIGO,
                                  INNER JOIN (SELECT CLICODIGO,E.ZOCODIGO FROM ENDCLI E
                                   INNER JOIN (SELECT ZOCODIGO FROM ZONA 
                                    WHERE ZOCODIGO IN (20))Z ON E.ZOCODIGO=Z.ZOCODIGO WHERE ENDFAT='S')A ON C.CLICODIGO=A.CLICODIGO
-                                    LEFT OUTER JOIN (SELECT DISTINCT SITCLI.CLICODIGO,SITCODIGO FROM SITCLI
+    
+-- INATIVOS
+
+    LEFT OUTER JOIN (SELECT DISTINCT SITCLI.CLICODIGO,SITCODIGO FROM SITCLI
     INNER JOIN (SELECT DISTINCT SITCLI.CLICODIGO,MAX(SITDATA)ULTIMA FROM SITCLI
     GROUP BY 1)A ON SITCLI.CLICODIGO=A.CLICODIGO AND A.ULTIMA=SITCLI.SITDATA 
     INNER JOIN (SELECT DISTINCT SITCLI.CLICODIGO,SITDATA,MAX(SITSEQ)USEQ FROM SITCLI
     GROUP BY 1,2)MSEQ ON A.CLICODIGO=MSEQ.CLICODIGO AND MSEQ.SITDATA=A.ULTIMA 
     AND MSEQ.USEQ=SITCLI.SITSEQ WHERE SITCODIGO=4) INT ON C.CLICODIGO=INT.CLICODIGO
                                     WHERE CLICLIENTE='S' AND INT.CLICODIGO IN NULL),
-                           
+ -- TABELAS CLIENTES
+ 
             CLITB AS (SELECT CT.CLICODIGO,
                               CLIPCDESCPRODU,
                                TBPCODIGO 
                                 FROM CLITBP CT
                                  INNER JOIN CLI C ON C.CLICODIGO=CT.CLICODIGO),
-                          
+ 
+ -- TABELAS NEGOCIACAO
+ 
              TBPRECO AS (SELECT TBPCODIGO 
                                  FROM TABPRECO WHERE (TBPDTVALIDADE>='TODAY' OR TBPDTVALIDADE IS NULL) AND TBPSITUACAO='A'),              
-           
+ 
+ -- MONTAGENS          
                MONT AS (SELECT PROCODIGO,
                                 PRODESCRICAO 
                                  FROM PRODU 
                                   WHERE PROCODIGO IN ('MOVS','MOMF','MOBF','MOPA')),
-               
+ -- PRECO              
                 PRECO AS (SELECT P.PROCODIGO,
                                   PREPCOVENDA2 FROM PREMP P
                                     WHERE EMPCODIGO=1 AND PROCODIGO IN ('MOVS','MOMF','MOBF','MOPA')),
-           
+   
+   
+ -- CALCULO NEG MONTAGEM           
                   NEG_MONT AS(SELECT T.*,
                                CLICODIGO,
                    CASE 
@@ -44,11 +55,15 @@ WITH CLI AS (SELECT DISTINCT C.CLICODIGO,
             
             NEG_MONT2 AS(SELECT * FROM NEG_MONT WHERE VALOR IS NOT NULL),
             
+-- AJUSTE BUSCA VALOR MINIMO MONTAGEM            
+            
             NEG_MONT3 AS (SELECT CLICODIGO,
                                   PROCODIGO,
                                    MIN(VALOR) VALOR
                                     FROM NEG_MONT2 
                                      GROUP BY 1,2),
+                                     
+-- CROSS JOIN CLIENTES MONTAGENS                                     
             
             CJ AS (SELECT CLICODIGO,
                            PROCODIGO 
@@ -69,10 +84,10 @@ WITH CLI AS (SELECT DISTINCT C.CLICODIGO,
                           LEFT JOIN PRECO P ON M.PROCODIGO=P.PROCODIGO)
                           
                           
-                SELECT CLICODIGO,
-                        PROCODIGO,
-                         COALESCE(VALOR, CJ2.VALOR) AS VALOR
-                          FROM NEG_MONT4
-                           LEFT JOIN CJ2 ON CJ2.CLICODIGO=NEG_MONT4.CLICODIGO AND CJ2.PROCODIGO=NEG_MONT4.PROCODIGO
+                SELECT M4.CLICODIGO,
+                        M4.PROCODIGO,
+                         COALESCE(M4.VALOR, CJ2.VALOR) AS VALOR
+                          FROM NEG_MONT4 M4
+                           LEFT JOIN CJ2 ON CJ2.CLICODIGO=M4.CLICODIGO AND CJ2.PROCODIGO=M4.PROCODIGO
              
              
